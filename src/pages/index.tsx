@@ -72,31 +72,6 @@ const Home = () => {
   // | 11 = 爆弾
   const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
-  const reloadBoard = () => {
-    for (let l = 0; l < 9; l++) {
-      for (let m = 0; m < 9; m++) {
-        if (userInputs[m][l] === 1) {
-          let tempX = l;
-          let tempY = m;
-          let tempCount = 0;
-          for (let n = 0; n < directions.length; n++) {
-            tempX += directions[n][1];
-            tempY += directions[n][0];
-            if (tempX < 0 || tempX > 8 || tempY < 0 || tempY > 8) {
-              continue;
-            }
-            if (bombMap[tempX][tempY] === 1) {
-              console.log(m, l, 'add', tempX, tempY);
-              tempCount++;
-            }
-            console.log(m, l, tempCount);
-            board[m][l] = tempCount;
-          }
-        }
-      }
-    }
-  };
-
   const setBombRandom = (x: number, y: number) => {
     const numA = Math.floor(9 * Math.random());
     const numB = Math.floor(9 * Math.random());
@@ -108,6 +83,35 @@ const Home = () => {
       console.log('bomb', numA, numB);
     } else {
       setBombRandom(x, y);
+    }
+  };
+
+  const reloadBoard = () => {
+    for (let l = 0; l < 9; l++) {
+      for (let m = 0; m < 9; m++) {
+        if (userInputs[l][m] === 1) {
+          if (bombMap[l][m] === 1) {
+            board[l][m] = 11;
+            continue;
+          }
+          console.log('x', l, 'y', m);
+          let tempCount = 0;
+          for (let n = 0; n < directions.length; n++) {
+            const tempX = l + directions[n][0];
+            const tempY = m + directions[n][1];
+            if (tempX < 0 || tempX > 8 || tempY < 0 || tempY > 8) {
+              console.log('[', n, ']', tempX, tempY, '(skip');
+              continue;
+            }
+            console.log('[', n, ']', tempX, tempY);
+            if (bombMap[tempX][tempY] === 1) {
+              tempCount++;
+            }
+            console.log(l, m, tempCount);
+            board[l][m] = tempCount;
+          }
+        }
+      }
     }
   };
 
