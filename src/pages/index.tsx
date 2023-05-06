@@ -1,60 +1,127 @@
+import { useState } from 'react';
 import styles from './index.module.css';
 
 const Home = () => {
+  // pretier-ignore
+
+  const directions = [
+    [-1, 0],
+    [-1, -1],
+    [0, -1],
+    [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+  ];
+  const bombCount = 10;
+
+  const [userInputs, setUserInputs] = useState([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ]);
+  const [bombMap, setBombMap] = useState([
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  ]);
+
+  const board: number[][] = [
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
+  ];
+
+  // let zeroList: { x: number; y: number }[]
+  // for () {
+  //   zeroList = // board + directions + userInputs + bombMap
+  // }
+  // let openedCount: number
+  // for () {
+  //   openedCount = // board
+  // }
+  // const isSuccess = // openedCount + bombCount
+  // let isFailure: boolean
+  // for () {
+  //   isFialure = // userInputs + bombMap
+  // }
+  // let isStarted: boolean
+  // for () {
+  //   isStarted = // userInputs
+  // }
+  // const board: number[][] = [];
+
+  const addZeroAroundZero = (x: number, y: number) => {
+    console.log('test');
+  };
+  const clickCell = (x: number, y: number) => {
+    console.log(x, y);
+  };
+
+  // const reset = () => ...
+
+  // クリック時の処理 (clickCell)
+  // setBombMap([ →]) * 重複しないよう ランダムに爆弾を生成
+  // setUserInputs
+
+  // UseEffect 時計管理
+  // - userInputsが1つ以上 → ゲーム中 (時計)
+  // - 爆発していたら → ゲーム終了
+
+  // 計算値
+  // is playeing = bool
+  // const openedCount = 計算
+
   return (
     <div className={styles.container}>
-      <main className={styles.main}>
-        <div className={styles.icon} />
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code} style={{ backgroundColor: '#fafafa' }}>
-            pages/index.js
-          </code>
-        </p>
-
-        <div className={styles.grid}>
-          <a className={styles.card} href="https://nextjs.org/docs">
-            <h2>Documentation &rarr;</h2>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a className={styles.card} href="https://nextjs.org/learn">
-            <h2>Learn &rarr;</h2>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a className={styles.card} href="https://github.com/vercel/next.js/tree/master/examples">
-            <h2>Examples &rarr;</h2>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            className={styles.card}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          >
-            <h2>Deploy &rarr;</h2>
-            <p>Instantly deploy your Next.js site to a public URL with Vercel.</p>
-          </a>
+      <div className={styles.board}>
+        <header className={styles.header}>
+          <div className={styles.bombcount} />
+          <div className={styles.face} />
+          <div className={styles.timercount} />
+        </header>
+        <div className={styles.main}>
+          {board.map((row: number[], y) =>
+            row.map((cell, x) => (
+              <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickCell(x, y)}>
+                {cell !== 0 && (
+                  <div className={styles.cell} style={{ backgroundPosition: -30 * (cell - 1) }}>
+                    {cell === -1 && <div className={styles.stone}>{cell}</div>}
+                  </div>
+                )}
+              </div>
+            ))
+          )}
         </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Powered by{' '}
-          <span className={styles.logo}>
-            <img src="vercel.svg" alt="Vercel Logo" width={72} height={16} />
-          </span>
-        </a>
-      </footer>
+      </div>
     </div>
   );
 };
 
 export default Home;
+
+// 評価基準
+// ・仕様準拠
+// ・useState の数
+// ・useEffect 内の行数
+// ・計算値の多様
+// ・再帰
