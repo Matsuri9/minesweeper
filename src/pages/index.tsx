@@ -72,13 +72,30 @@ const Home = () => {
   // | 11 = 爆弾
   const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
-  for (let i = 0; i < 9; i++) {
-    for (let j = 0; j < 9; j++) {
-      if (userInputs[j][i] === 1) {
-        board[j][i] = 0;
+  const reloadBoard = () => {
+    for (let l = 0; l < 9; l++) {
+      for (let m = 0; m < 9; m++) {
+        if (userInputs[m][l] === 1) {
+          let tempX = l;
+          let tempY = m;
+          let tempCount = 0;
+          for (let n = 0; n < directions.length; n++) {
+            tempX += directions[n][1];
+            tempY += directions[n][0];
+            if (tempX < 0 || tempX > 8 || tempY < 0 || tempY > 8) {
+              continue;
+            }
+            if (bombMap[tempX][tempY] === 1) {
+              console.log(m, l, 'add', tempX, tempY);
+              tempCount++;
+            }
+            console.log(m, l, tempCount);
+            board[m][l] = tempCount;
+          }
+        }
       }
     }
-  }
+  };
 
   const setBombRandom = (x: number, y: number) => {
     const numA = Math.floor(9 * Math.random());
@@ -88,6 +105,7 @@ const Home = () => {
     } else if (bombMap[numA][numB] === 0) {
       bombMap[numA][numB] = 1;
       setBombMap(bombMap);
+      console.log('bomb', numA, numB);
     } else {
       setBombRandom(x, y);
     }
@@ -96,6 +114,11 @@ const Home = () => {
   const addZeroAroundZero = (x: number, y: number) => {
     console.log('test');
   };
+
+  // 以下実行部分
+
+  reloadBoard();
+
   const clickCell = (x: number, y: number) => {
     if (!isStarted) {
       console.log('start');
@@ -136,7 +159,10 @@ const Home = () => {
             row.map((cell, x) => (
               <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickCell(x, y)}>
                 {cell !== 0 && (
-                  <div className={styles.cell} style={{ backgroundPosition: -30 * (cell - 1) }}>
+                  <div
+                    className={styles.cell}
+                    style={{ backgroundPosition: -30 * (board[y][x] - 1) }}
+                  >
                     {cell === -1 && <div className={styles.stone}>{cell}</div>}
                   </div>
                 )}
