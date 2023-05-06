@@ -39,24 +39,6 @@ const Home = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ]);
 
-  const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
-
-  // [ board ]
-  // -1 = 石
-  // 0 = 石なし表示なし
-  // 1~8 = 数字表示
-  // 9 = 石 + はてな
-  // 10 = 石 + 旗
-  // 11 = 爆弾
-
-  for (let i = 0; i < 9; i++) {
-    for (let j = 0; j < 9; j++) {
-      if (userInputs[j][i] === 1) {
-        board[j][i] = 0;
-      }
-    }
-  }
-
   const newUserInputs: number[][] = JSON.parse(JSON.stringify(userInputs));
 
   // let zeroList: { x: number; y: number }[]
@@ -72,13 +54,44 @@ const Home = () => {
   // for () {
   //   isFialure = // userInputs + bombMap
   // }
+
   let isStarted: boolean;
   if (newUserInputs.some((row: number[]) => row.includes(1))) {
     isStarted = true;
   } else {
     isStarted = false;
   }
-  // const board: number[][] = [];
+
+  // 表示用ボード設定
+
+  // | -1 = 石
+  // | 0 = 石なし表示なし
+  // | 1~8 = 数字表示
+  // | 9 = 石 + はてな
+  // | 10 = 石 + 旗
+  // | 11 = 爆弾
+  const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
+
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      if (userInputs[j][i] === 1) {
+        board[j][i] = 0;
+      }
+    }
+  }
+
+  const setBombRandom = (x: number, y: number) => {
+    const numA = Math.floor(9 * Math.random());
+    const numB = Math.floor(9 * Math.random());
+    if (numA === x && numB === y) {
+      setBombRandom(x, y);
+    } else if (bombMap[numA][numB] === 0) {
+      bombMap[numA][numB] = 1;
+      setBombMap(bombMap);
+    } else {
+      setBombRandom(x, y);
+    }
+  };
 
   const addZeroAroundZero = (x: number, y: number) => {
     console.log('test');
@@ -86,6 +99,9 @@ const Home = () => {
   const clickCell = (x: number, y: number) => {
     if (!isStarted) {
       console.log('start');
+      for (let i = 0; i < bombCount; i++) {
+        setBombRandom(y, x);
+      }
     } else {
       console.log('started');
     }
