@@ -39,17 +39,25 @@ const Home = () => {
     [0, 0, 0, 0, 0, 0, 0, 0, 0],
   ]);
 
-  const board: number[][] = [
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-    [-1, -1, -1, -1, -1, -1, -1, -1, -1],
-  ];
+  const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
+
+  // [ board ]
+  // -1 = 石
+  // 0 = 石なし表示なし
+  // 1~8 = 数字表示
+  // 9 = 石 + はてな
+  // 10 = 石 + 旗
+  // 11 = 爆弾
+
+  for (let i = 0; i < 9; i++) {
+    for (let j = 0; j < 9; j++) {
+      if (userInputs[j][i] === 1) {
+        board[j][i] = 0;
+      }
+    }
+  }
+
+  const newUserInputs: number[][] = JSON.parse(JSON.stringify(userInputs));
 
   // let zeroList: { x: number; y: number }[]
   // for () {
@@ -64,22 +72,30 @@ const Home = () => {
   // for () {
   //   isFialure = // userInputs + bombMap
   // }
-  // let isStarted: boolean
-  // for () {
-  //   isStarted = // userInputs
-  // }
+  let isStarted: boolean;
+  if (newUserInputs.some((row: number[]) => row.includes(1))) {
+    isStarted = true;
+  } else {
+    isStarted = false;
+  }
   // const board: number[][] = [];
 
   const addZeroAroundZero = (x: number, y: number) => {
     console.log('test');
   };
   const clickCell = (x: number, y: number) => {
-    console.log(x, y);
+    if (!isStarted) {
+      console.log('start');
+    } else {
+      console.log('started');
+    }
+    const newInputs = [...userInputs];
+    newInputs[y][x] = 1;
+    setUserInputs(newInputs);
   };
 
   // const reset = () => ...
 
-  // クリック時の処理 (clickCell)
   // setBombMap([ →]) * 重複しないよう ランダムに爆弾を生成
   // setUserInputs
 
@@ -100,7 +116,7 @@ const Home = () => {
           <div className={styles.timercount} />
         </header>
         <div className={styles.main}>
-          {board.map((row: number[], y) =>
+          {board.map((row, y) =>
             row.map((cell, x) => (
               <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickCell(x, y)}>
                 {cell !== 0 && (

@@ -61,6 +61,7 @@
   flex-shrink: 0;
   width: 24px;
   height: 24px;
+  float: left;
   background: url('~/assets/images/icons.png');
 }
 
