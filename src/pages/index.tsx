@@ -45,10 +45,15 @@ const Home = () => {
   // for () {
   //   zeroList = // board + directions + userInputs + bombMap
   // }
-  // let openedCount: number
-  // for () {
-  //   openedCount = // board
-  // }
+  const openedCount = userInputs.reduce((acc, row) => {
+    return (
+      acc +
+      row.reduce((acc2, val) => {
+        return acc2 + (val !== 0 ? 1 : 0);
+      }, 0)
+    );
+  }, 0);
+  console.log(openedCount);
   // const isSuccess = // openedCount + bombCount
   // let isFailure: boolean
   // for () {
@@ -125,7 +130,6 @@ const Home = () => {
 
   const clickCell = (x: number, y: number) => {
     if (!isStarted) {
-      console.log('start');
       for (let i = 0; i < bombCount; i++) {
         setBombRandom(y, x);
       }
@@ -138,9 +142,6 @@ const Home = () => {
   };
 
   // const reset = () => ...
-
-  // setBombMap([ →]) * 重複しないよう ランダムに爆弾を生成
-  // setUserInputs
 
   // UseEffect 時計管理
   // - userInputsが1つ以上 → ゲーム中 (時計)
