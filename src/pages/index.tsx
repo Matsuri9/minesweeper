@@ -115,13 +115,24 @@ const Home = () => {
             console.log(l, m, tempCount);
             board[l][m] = tempCount;
           }
+          if (board[l][m] === 0) {
+            addZeroAroundZero(l, m);
+          }
         }
       }
     }
   };
 
+  const tempBoard: number[][] = Array.from({ length: 9 }, () => Array(9).fill(0));
   const addZeroAroundZero = (x: number, y: number) => {
-    console.log('test');
+    for (let i = 0; i < 9; i++) {
+      const tempX = x + directions[i][0];
+      const tempY = x + directions[i][1];
+      if (bombMap[tempX][tempY] !== 1 && tempBoard[tempX][tempY] === 0) {
+        tempBoard[tempX][tempY] = 1;
+        addZeroAroundZero(x, y);
+      }
+    }
   };
 
   // 以下実行部分
@@ -141,15 +152,15 @@ const Home = () => {
     setUserInputs(newInputs);
   };
 
+  const rightClickCell = (x: number, y: number) => {
+    console.log('右クリック');
+  };
+
   // const reset = () => ...
 
   // UseEffect 時計管理
   // - userInputsが1つ以上 → ゲーム中 (時計)
   // - 爆発していたら → ゲーム終了
-
-  // 計算値
-  // is playeing = bool
-  // const openedCount = 計算
 
   return (
     <div className={styles.container}>
@@ -162,12 +173,18 @@ const Home = () => {
         <div className={styles.main}>
           {board.map((row, y) =>
             row.map((cell, x) => (
-              <div className={styles.cell} key={`${x}-${y}`} onClick={() => clickCell(x, y)}>
+              <div
+                className={styles.cell}
+                key={`${x}-${y}`}
+                onClick={() => clickCell(x, y)}
+                onContextMenu={() => rightClickCell(x, y)}
+              >
                 {cell !== 0 && (
                   <div
-                    className={styles.cell}
+                    className={styles.tile}
                     style={{ backgroundPosition: -30 * (board[y][x] - 1) }}
                   >
+                    {(cell === 0 || cell === 9 || cell === 10) && <div className={styles.tile} />}
                     {cell === -1 && <div className={styles.stone}>{cell}</div>}
                   </div>
                 )}
