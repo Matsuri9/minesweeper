@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { useState } from 'react';
 import styles from './index.module.css';
 
@@ -67,13 +68,17 @@ const Home = () => {
   }
 
   // 表示用ボード設定
-
+  // [board]
   // | -1 = 石
   // | 0 = 石なし表示なし
   // | 1~8 = 数字表示
   // | 9 = 石 + はてな
   // | 10 = 石 + 旗
   // | 11 = 爆弾
+  // [userInput]
+  // | 0 = default
+  // | 1 = clicked
+  // | 9 = flag
   const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
   const setBombRandom = (x: number, y: number) => {
@@ -96,6 +101,9 @@ const Home = () => {
           if (bombMap[l][m] === 1) {
             board[l][m] = 11;
             continue;
+          }
+          if (userInputs[l][m] === 9) {
+            board[l][m] = 9;
           }
           let tempCount = 0;
           for (let n = 0; n < directions.length; n++) {
@@ -163,8 +171,9 @@ const Home = () => {
     }
   };
 
-  const rightClickCell = (x: number, y: number) => {
-    console.log('右クリック');
+  const rightClickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    console.log(y, x);
   };
 
   // const reset = () => ...
@@ -188,7 +197,7 @@ const Home = () => {
                 className={styles.cell}
                 key={`${x}-${y}`}
                 onClick={() => clickCell(x, y)}
-                onContextMenu={() => rightClickCell(x, y)}
+                onContextMenu={(event) => rightClickCell(x, y, event)}
               >
                 {cell !== 0 && (
                   <div
@@ -196,7 +205,7 @@ const Home = () => {
                     style={{ backgroundPosition: -30 * (board[y][x] - 1) }}
                   >
                     {(cell === 0 || cell === 9 || cell === 10) && <div className={styles.tile} />}
-                    {cell === -1 && <div className={styles.stone}>{cell}</div>}
+                    {cell === -1 && <div className={styles.stone} />}
                   </div>
                 )}
               </div>
