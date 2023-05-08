@@ -53,7 +53,6 @@ const Home = () => {
       }, 0)
     );
   }, 0);
-  console.log(openedCount);
   // const isSuccess = // openedCount + bombCount
   // let isFailure: boolean
   // for () {
@@ -85,7 +84,6 @@ const Home = () => {
     } else if (bombMap[numA][numB] === 0) {
       bombMap[numA][numB] = 1;
       setBombMap(bombMap);
-      console.log('bomb', numA, numB);
     } else {
       setBombRandom(x, y);
     }
@@ -99,40 +97,49 @@ const Home = () => {
             board[l][m] = 11;
             continue;
           }
-          console.log('x', l, 'y', m);
           let tempCount = 0;
           for (let n = 0; n < directions.length; n++) {
             const tempX = l + directions[n][0];
             const tempY = m + directions[n][1];
             if (tempX < 0 || tempX > 8 || tempY < 0 || tempY > 8) {
-              console.log('[', n, ']', tempX, tempY, '(skip');
               continue;
             }
-            console.log('[', n, ']', tempX, tempY);
             if (bombMap[tempX][tempY] === 1) {
               tempCount++;
             }
-            console.log(l, m, tempCount);
             board[l][m] = tempCount;
-          }
-          if (board[l][m] === 0) {
-            addZeroAroundZero(l, m);
           }
         }
       }
     }
   };
 
-  const tempBoard: number[][] = Array.from({ length: 9 }, () => Array(9).fill(0));
   const addZeroAroundZero = (x: number, y: number) => {
-    for (let i = 0; i < 9; i++) {
-      const tempX = x + directions[i][0];
-      const tempY = x + directions[i][1];
-      if (bombMap[tempX][tempY] !== 1 && tempBoard[tempX][tempY] === 0) {
-        tempBoard[tempX][tempY] = 1;
-        addZeroAroundZero(x, y);
+    const checkAround = (x: number, y: number) => {
+      if (board[x][y] === 0) {
+        for (let i = 0; i < directions.length; i++) {
+          const checkX = x + directions[i][0];
+          const checkY = y + directions[i][1];
+          if (checkX < 0 || checkX > 8 || checkY < 0 || checkY > 8) {
+            continue;
+          }
+          if (newInputs[checkX][checkY] === 0) {
+            if (bombMap[checkX][checkY] === 0) {
+              newInputs[checkX][checkY] = 1;
+              reloadBoard();
+              checkAround(checkX, checkY);
+            }
+          }
+        }
       }
-    }
+    };
+
+    if (bombMap[x][y] === 1) return;
+    const newInputs = [...userInputs];
+
+    checkAround(x, y);
+
+    setUserInputs([...newInputs]);
   };
 
   // 以下実行部分
@@ -145,11 +152,15 @@ const Home = () => {
         setBombRandom(y, x);
       }
     } else {
-      console.log('started');
+      // console.log('started');
     }
     const newInputs = [...userInputs];
     newInputs[y][x] = 1;
     setUserInputs(newInputs);
+    reloadBoard();
+    if (board[y][x] === 0) {
+      addZeroAroundZero(y, x);
+    }
   };
 
   const rightClickCell = (x: number, y: number) => {
