@@ -9,12 +9,16 @@
 }
 
 .board {
-  width: 306px;
-  height: 367.5px;
+  width: 314px;
+  height: 375.5px;
   background-color: gray;
   display: flex;
   flex-wrap: wrap;
   position: relative;
+  border-top: solid 4px #fff;
+  border-left: solid 4px #fff;
+  border-right: solid 4px #868686;
+  border-bottom: solid 4px #868686;
 }
 
 /* header */

@@ -85,7 +85,8 @@ const Home = () => {
   // [userInput]
   // | 0 = default
   // | 1 = clicked
-  // | 9 = flag
+  // | 9 = question
+  // | 10 = flag
   const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
   const setBombRandom = (x: number, y: number) => {
@@ -101,6 +102,38 @@ const Home = () => {
     }
   };
 
+  const openNearTile = (x: number, y: number) => {
+    const tempInputs: number[][] = Array.from({ length: 9 }, () => Array(9).fill(0));
+    const nearBombCount = board[x][y];
+    let nearFlagCount = 0;
+    for (let i = 0; i < 8; i++) {
+      const tempX = x + directions[i][0];
+      const tempY = y + directions[i][1];
+      if (tempX < 0 || tempX > 8 || tempY < 0 || tempY > 8) {
+        continue;
+      }
+      if (userInputs[tempX][tempY] === 10) {
+        nearFlagCount++;
+      } else if (userInputs[tempX][tempY] === 0) {
+        tempInputs[tempX][tempY] = 1;
+      }
+    }
+
+    if (nearBombCount !== nearFlagCount) {
+      return;
+    }
+    const newInputs = [...userInputs];
+    for (let l = 0; l < 9; l++) {
+      for (let m = 0; m < 9; m++) {
+        if (tempInputs[l][m] === 1) {
+          newInputs[l][m] = 1;
+        }
+        setUserInputs([...newInputs]);
+        reloadBoard();
+      }
+    }
+  };
+
   const endGameByRefuse = () => {
     if (openedCount === 81 - bombCount) {
       // 改編の余地あり
@@ -111,6 +144,7 @@ const Home = () => {
 
   const endGameByBomb = () => {
     gameState = 3;
+
     console.log('log> game end (by exploded)');
   };
 
@@ -176,8 +210,6 @@ const Home = () => {
     setUserInputs([...newInputs]);
   };
 
-  // 以下実行部分
-
   reloadBoard();
 
   const clickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
@@ -217,6 +249,7 @@ const Home = () => {
       reloadBoard();
       return;
     } else if (userInputs[y][x] !== 0) {
+      openNearTile(y, x);
       return;
     }
     newInputs[y][x] = 10;
@@ -259,20 +292,11 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.board}>
         <header className={styles.header}>
-          {gameState === 0 && (
-            <button
-              className={styles['reset-button']}
-              onClick={reset}
-              style={{ backgroundPosition: -416 }}
-            />
-          )}
-          {gameState !== 0 && (
-            <button
-              className={styles['reset-button']}
-              onClick={reset}
-              style={{ backgroundPosition: -377 - 39 * gameState }}
-            />
-          )}
+          <button
+            className={styles['reset-button']}
+            onClick={reset}
+            style={{ backgroundPosition: gameState === 0 ? -408 : -370 - 38 * gameState }}
+          />
         </header>
         <div className={styles.main}>
           {board.map((row, y) =>
