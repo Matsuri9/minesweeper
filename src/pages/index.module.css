@@ -86,3 +86,11 @@
   border-right: solid 4px #868686;
   border-bottom: solid 4px #868686;
 }
+
+.flag {
+  height: 136%;
+  width: 136%;
+  margin: -4px 2px 2px -2px;
+  float: left;
+  background: url('~/assets/images/icons.png');
+}

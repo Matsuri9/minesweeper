@@ -104,6 +104,10 @@ const Home = () => {
           }
           if (userInputs[l][m] === 9) {
             board[l][m] = 9;
+            continue;
+          } else if (userInputs[l][m] === 10) {
+            board[l][m] = 10;
+            continue;
           }
           let tempCount = 0;
           for (let n = 0; n < directions.length; n++) {
@@ -154,7 +158,12 @@ const Home = () => {
 
   reloadBoard();
 
-  const clickCell = (x: number, y: number) => {
+  const clickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if (userInputs[y][x] !== 0) {
+      console.log(board[y][x], userInputs[y][x]);
+      return;
+    }
     if (!isStarted) {
       for (let i = 0; i < bombCount; i++) {
         setBombRandom(y, x);
@@ -173,7 +182,24 @@ const Home = () => {
 
   const rightClickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    console.log(y, x);
+    const newInputs = [...userInputs];
+    console.log(y, x, '=');
+    if (userInputs[y][x] === 10) {
+      newInputs[y][x] = 9;
+      setUserInputs(newInputs);
+      reloadBoard();
+      return;
+    } else if (userInputs[y][x] === 9) {
+      newInputs[y][x] = 0;
+      setUserInputs(newInputs);
+      reloadBoard();
+      return;
+    } else if (userInputs[y][x] !== 0) {
+      return;
+    }
+    newInputs[y][x] = 10;
+    setUserInputs(newInputs);
+    reloadBoard();
   };
 
   // const reset = () => ...
@@ -196,7 +222,7 @@ const Home = () => {
               <div
                 className={styles.cell}
                 key={`${x}-${y}`}
-                onClick={() => clickCell(x, y)}
+                onClick={(event) => clickCell(x, y, event)}
                 onContextMenu={(event) => rightClickCell(x, y, event)}
               >
                 {cell !== 0 && (
@@ -204,8 +230,19 @@ const Home = () => {
                     className={styles.tile}
                     style={{ backgroundPosition: -30 * (board[y][x] - 1) }}
                   >
-                    {(cell === 0 || cell === 9 || cell === 10) && <div className={styles.tile} />}
-                    {cell === -1 && <div className={styles.stone} />}
+                    {cell === 0 && <div className={styles.tile} />}
+                    {(userInputs[y][x] === 0 ||
+                      userInputs[y][x] === 9 ||
+                      userInputs[y][x] === 10) && (
+                      <div className={styles.stone}>
+                        {(userInputs[y][x] === 9 || userInputs[y][x] === 10) && (
+                          <div
+                            className={styles.flag}
+                            style={{ backgroundPosition: -30 * (userInputs[y][x] - 1) }}
+                          />
+                        )}
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
