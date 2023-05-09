@@ -20,13 +20,17 @@
 /* header */
 
 .header {
-  width: 306px;
-  height: 64.5px;
-  background-color: #868686;
-  border-width: 10px;
-  border-top-style: ridge;
-  border-right-style: ridge;
-  border-left-style: ridge;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 64vmin;
+  max-width: 640px;
+  background-color: #c0c0c0;
+  padding: min(12px, 0.8vmin);
+  border-top: solid 6px #868686;
+  border-left: solid 6px #868686;
+  border-right: solid 6px #fff;
+  border-bottom: solid 6px #fff;
 }
 
 .bombcount {
@@ -41,7 +45,7 @@
   background-position-x: 300%;
   aspect-ratio: 1;
   padding: 0;
-  margin: 0;
+  margin: 0 auto;
   background-color: #c6c6c6;
   background-image: url('~/assets/images/icons.png');
   outline: solid 1px #808080;

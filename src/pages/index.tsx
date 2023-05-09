@@ -46,28 +46,35 @@ const Home = () => {
   // for () {
   //   zeroList = // board + directions + userInputs + bombMap
   // }
-  const openedCount = userInputs.reduce((acc, row) => {
-    return (
-      acc +
-      row.reduce((acc2, val) => {
-        return acc2 + (val !== 0 ? 1 : 0);
-      }, 0)
-    );
-  }, 0);
+  let openedCount = 0;
+  for (let l = 0; l < 9; l++) {
+    for (let m = 0; m < 9; m++) {
+      if (userInputs[l][m] === 1) {
+        openedCount++;
+      }
+    }
+  }
   // const isSuccess = // openedCount + bombCount
   // let isFailure: boolean
   // for () {
   //   isFialure = // userInputs + bombMap
   // }
 
+  // [GameState]
+  // | 0 : スタート前
+  // | 1 : ゲーム中
+  // | 2 : ゲーム終了(クリア)
+  // | 3 : ゲーム終了(爆発)
+  let gameState: 0 | 1 | 2 | 3 = 0;
+
   let isStarted: boolean;
   if (newUserInputs.some((row: number[]) => row.includes(1))) {
     isStarted = true;
+    gameState = 1;
   } else {
     isStarted = false;
   }
 
-  // 表示用ボード設定
   // [board]
   // | -1 = 石
   // | 0 = 石なし表示なし
@@ -94,12 +101,26 @@ const Home = () => {
     }
   };
 
+  const endGameByRefuse = () => {
+    if (openedCount === 81 - bombCount) {
+      // 改編の余地あり
+      gameState = 2;
+      console.log('log> game end (by refused)');
+    }
+  };
+
+  const endGameByBomb = () => {
+    gameState = 3;
+    console.log('log> game end (by exploded)');
+  };
+
   const reloadBoard = () => {
     for (let l = 0; l < 9; l++) {
       for (let m = 0; m < 9; m++) {
         if (userInputs[l][m] === 1) {
           if (bombMap[l][m] === 1) {
             board[l][m] = 11;
+            endGameByBomb();
             continue;
           }
           if (userInputs[l][m] === 9) {
@@ -124,6 +145,7 @@ const Home = () => {
         }
       }
     }
+    endGameByRefuse();
   };
 
   const addZeroAroundZero = (x: number, y: number) => {
@@ -160,15 +182,14 @@ const Home = () => {
 
   const clickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (userInputs[y][x] !== 0) {
+    if (userInputs[y][x] !== 0 || gameState === 2 || gameState === 3) {
       return;
     }
     if (!isStarted) {
+      console.log('log> game started');
       for (let i = 0; i < bombCount; i++) {
         setBombRandom(y, x);
       }
-    } else {
-      // console.log('started');
     }
     const newInputs = [...userInputs];
     newInputs[y][x] = 1;
@@ -181,6 +202,9 @@ const Home = () => {
 
   const rightClickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
+    if (gameState === 2 || gameState === 3) {
+      return;
+    }
     const newInputs = [...userInputs];
     if (userInputs[y][x] === 10) {
       newInputs[y][x] = 9;
@@ -201,10 +225,30 @@ const Home = () => {
   };
 
   const reset = () => {
-    const zeroInputs = Array.from({ length: 9 }, () => Array(9).fill(0));
-    setUserInputs(zeroInputs);
-    setBombMap(zeroInputs);
-    console.log('reset the game');
+    setUserInputs([
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]);
+    setBombMap([
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+      [0, 0, 0, 0, 0, 0, 0, 0, 0],
+    ]);
+    console.log('log> game reset');
+    gameState = 0;
   };
 
   // UseEffect 時計管理
@@ -215,11 +259,20 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.board}>
         <header className={styles.header}>
-          <button
-            className={styles['reset-button']}
-            onClick={reset}
-            style={{ backgroundPosition: -330 }}
-          />
+          {gameState === 0 && (
+            <button
+              className={styles['reset-button']}
+              onClick={reset}
+              style={{ backgroundPosition: -416 }}
+            />
+          )}
+          {gameState !== 0 && (
+            <button
+              className={styles['reset-button']}
+              onClick={reset}
+              style={{ backgroundPosition: -377 - 39 * gameState }}
+            />
+          )}
         </header>
         <div className={styles.main}>
           {board.map((row, y) =>
