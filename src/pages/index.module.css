@@ -34,12 +34,21 @@
   height: 30px;
 }
 
-.face {
-  width: 39px;
-  height: 39px;
-  color: gray;
-
-  /* border: 5px outset; */
+.reset-button {
+  display: block;
+  width: min(16%, 8vmin);
+  background-size: 1400%;
+  background-position-x: 300%;
+  aspect-ratio: 1;
+  padding: 0;
+  margin: 0;
+  background-color: #c6c6c6;
+  background-image: url('~/assets/images/icons.png');
+  outline: solid 1px #808080;
+  border-top: solid 4px #fff;
+  border-left: solid 4px #fff;
+  border-right: solid 4px #868686;
+  border-bottom: solid 4px #868686;
 }
 
 .timercount {

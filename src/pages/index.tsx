@@ -161,7 +161,6 @@ const Home = () => {
   const clickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     if (userInputs[y][x] !== 0) {
-      console.log(board[y][x], userInputs[y][x]);
       return;
     }
     if (!isStarted) {
@@ -183,7 +182,6 @@ const Home = () => {
   const rightClickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
     const newInputs = [...userInputs];
-    console.log(y, x, '=');
     if (userInputs[y][x] === 10) {
       newInputs[y][x] = 9;
       setUserInputs(newInputs);
@@ -202,7 +200,12 @@ const Home = () => {
     reloadBoard();
   };
 
-  // const reset = () => ...
+  const reset = () => {
+    const zeroInputs = Array.from({ length: 9 }, () => Array(9).fill(0));
+    setUserInputs(zeroInputs);
+    setBombMap(zeroInputs);
+    console.log('reset the game');
+  };
 
   // UseEffect 時計管理
   // - userInputsが1つ以上 → ゲーム中 (時計)
@@ -212,9 +215,11 @@ const Home = () => {
     <div className={styles.container}>
       <div className={styles.board}>
         <header className={styles.header}>
-          <div className={styles.bombcount} />
-          <div className={styles.face} />
-          <div className={styles.timercount} />
+          <button
+            className={styles['reset-button']}
+            onClick={reset}
+            style={{ backgroundPosition: -330 }}
+          />
         </header>
         <div className={styles.main}>
           {board.map((row, y) =>
