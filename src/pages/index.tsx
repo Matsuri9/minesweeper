@@ -42,6 +42,15 @@ const Home = () => {
 
   const newUserInputs: number[][] = JSON.parse(JSON.stringify(userInputs));
 
+  // [GameState]
+  // | 0 : スタート前
+  // | 1 : ゲーム中
+  // | 2 : ゲーム終了(クリア)
+  // | 3 : ゲーム終了(爆発)
+  let gameState: 0 | 1 | 2 | 3 = 0;
+
+  // 計算値
+
   let openedCount = 0;
   for (let l = 0; l < 9; l++) {
     for (let m = 0; m < 9; m++) {
@@ -51,13 +60,6 @@ const Home = () => {
     }
   }
 
-  // [GameState]
-  // | 0 : スタート前
-  // | 1 : ゲーム中
-  // | 2 : ゲーム終了(クリア)
-  // | 3 : ゲーム終了(爆発)
-  let gameState: 0 | 1 | 2 | 3 = 0;
-
   let isStarted: boolean;
   if (newUserInputs.some((row: number[]) => row.includes(1))) {
     isStarted = true;
@@ -65,6 +67,10 @@ const Home = () => {
   } else {
     isStarted = false;
   }
+
+  // ボード設定
+
+  const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
   // [board]
   // | -1 = 石
@@ -79,8 +85,8 @@ const Home = () => {
   // | 9 = question
   // | 10 = flag
   // | 11 = bomb
-  const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
+  // 各種関数
   const setBombRandom = (x: number, y: number) => {
     const numA = Math.floor(9 * Math.random());
     const numB = Math.floor(9 * Math.random());
@@ -92,6 +98,34 @@ const Home = () => {
     } else {
       setBombRandom(x, y);
     }
+  };
+
+  const addZeroAroundZero = (x: number, y: number) => {
+    const checkAround = (x: number, y: number) => {
+      if (board[x][y] === 0) {
+        for (let i = 0; i < directions.length; i++) {
+          const checkX = x + directions[i][0];
+          const checkY = y + directions[i][1];
+          if (checkX < 0 || checkX > 8 || checkY < 0 || checkY > 8) {
+            continue;
+          }
+          if (newInputs[checkX][checkY] === 0) {
+            if (bombMap[checkX][checkY] === 0) {
+              newInputs[checkX][checkY] = 1;
+              reloadBoard();
+              checkAround(checkX, checkY);
+            }
+          }
+        }
+      }
+    };
+
+    if (bombMap[x][y] === 1) return;
+    const newInputs = [...userInputs];
+
+    checkAround(x, y);
+
+    setUserInputs([...newInputs]);
   };
 
   const openNearTile = (x: number, y: number) => {
@@ -146,6 +180,8 @@ const Home = () => {
     console.log('log> game end (by exploded)');
   };
 
+  // ボード出力
+
   const reloadBoard = () => {
     for (let l = 0; l < 9; l++) {
       for (let m = 0; m < 9; m++) {
@@ -178,34 +214,6 @@ const Home = () => {
       }
     }
     endGameByRefuse();
-  };
-
-  const addZeroAroundZero = (x: number, y: number) => {
-    const checkAround = (x: number, y: number) => {
-      if (board[x][y] === 0) {
-        for (let i = 0; i < directions.length; i++) {
-          const checkX = x + directions[i][0];
-          const checkY = y + directions[i][1];
-          if (checkX < 0 || checkX > 8 || checkY < 0 || checkY > 8) {
-            continue;
-          }
-          if (newInputs[checkX][checkY] === 0) {
-            if (bombMap[checkX][checkY] === 0) {
-              newInputs[checkX][checkY] = 1;
-              reloadBoard();
-              checkAround(checkX, checkY);
-            }
-          }
-        }
-      }
-    };
-
-    if (bombMap[x][y] === 1) return;
-    const newInputs = [...userInputs];
-
-    checkAround(x, y);
-
-    setUserInputs([...newInputs]);
   };
 
   const clickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
@@ -241,18 +249,13 @@ const Home = () => {
     const newInputs = [...userInputs];
     if (userInputs[y][x] === 10) {
       newInputs[y][x] = 9;
-      setUserInputs(newInputs);
-      reloadBoard();
-      return;
     } else if (userInputs[y][x] === 9) {
       newInputs[y][x] = 0;
-      setUserInputs(newInputs);
-      reloadBoard();
-      return;
     } else if (userInputs[y][x] !== 0) {
       return;
+    } else {
+      newInputs[y][x] = 10;
     }
-    newInputs[y][x] = 10;
     setUserInputs(newInputs);
     reloadBoard();
   };
