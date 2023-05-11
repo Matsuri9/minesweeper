@@ -42,10 +42,6 @@ const Home = () => {
 
   const newUserInputs: number[][] = JSON.parse(JSON.stringify(userInputs));
 
-  // let zeroList: { x: number; y: number }[]
-  // for () {
-  //   zeroList = // board + directions + userInputs + bombMap
-  // }
   let openedCount = 0;
   for (let l = 0; l < 9; l++) {
     for (let m = 0; m < 9; m++) {
@@ -54,11 +50,6 @@ const Home = () => {
       }
     }
   }
-  // const isSuccess = // openedCount + bombCount
-  // let isFailure: boolean
-  // for () {
-  //   isFialure = // userInputs + bombMap
-  // }
 
   // [GameState]
   // | 0 : スタート前
@@ -87,6 +78,7 @@ const Home = () => {
   // | 1 = clicked
   // | 9 = question
   // | 10 = flag
+  // | 11 = bomb
   const board: number[][] = Array.from({ length: 9 }, () => Array(9).fill(-1));
 
   const setBombRandom = (x: number, y: number) => {
@@ -132,6 +124,13 @@ const Home = () => {
         reloadBoard();
       }
     }
+    for (let l = 0; l < 9; l++) {
+      for (let m = 0; m < 9; m++) {
+        if (board[l][m] === 0) {
+          addZeroAroundZero(l, m);
+        }
+      }
+    }
   };
 
   const endGameByRefuse = () => {
@@ -144,7 +143,6 @@ const Home = () => {
 
   const endGameByBomb = () => {
     gameState = 3;
-
     console.log('log> game end (by exploded)');
   };
 
@@ -210,11 +208,14 @@ const Home = () => {
     setUserInputs([...newInputs]);
   };
 
-  reloadBoard();
-
   const clickCell = (x: number, y: number, event: MouseEvent<HTMLDivElement>) => {
     event.preventDefault();
-    if (userInputs[y][x] !== 0 || gameState === 2 || gameState === 3) {
+    if (userInputs[y][x] === 9 || userInputs[y][x] === 10 || gameState === 2 || gameState === 3) {
+      return;
+    }
+    if (userInputs[y][x] === 1) {
+      openNearTile(y, x);
+
       return;
     }
     if (!isStarted) {
@@ -249,13 +250,14 @@ const Home = () => {
       reloadBoard();
       return;
     } else if (userInputs[y][x] !== 0) {
-      openNearTile(y, x);
       return;
     }
     newInputs[y][x] = 10;
     setUserInputs(newInputs);
     reloadBoard();
   };
+
+  reloadBoard();
 
   const reset = () => {
     setUserInputs([
@@ -337,10 +339,3 @@ const Home = () => {
 };
 
 export default Home;
-
-// 評価基準
-// ・仕様準拠
-// ・useState の数
-// ・useEffect 内の行数
-// ・計算値の多様
-// ・再帰
